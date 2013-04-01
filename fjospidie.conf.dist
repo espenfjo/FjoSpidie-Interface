@@ -1,0 +1,34 @@
+name FjoSpidie
+using_frontend_proxy 1
+
+<Plugin::Authentication>
+ <default>
+     user_model    DBUsers::Client
+     class         SimpleDB
+     password_type self_check
+ </default>
+</Plugin::Authentication>
+
+<Model::DB>
+        schema_class   FjoSpidie::Schema
+        traits Caching
+        <connect_info>
+                dsn   dbi:mysql:dbname=fjospidie:host=localhost
+                user   fjospidie
+                password pw
+                auto_savepoint 1
+                quote_names 1
+        </connect_info>
+</Model::DB>
+<Model::DBUsers>
+        schema_class   FjoSpidie::Schema
+        traits Caching
+        <connect_info>
+                dsn   dbi:mysql:dbname=auth:host=localhost
+                user   fjospidie
+                password pw
+                auto_savepoint 1
+                quote_names 1
+        </connect_info>
+</Model::DBUsers>
+                                      

@@ -1,0 +1,18 @@
+<div class="row">
+<section class="urlform cf form">
+  <form id="urlform" action="/job" name="url" method="post" accept-charset="utf-8">
+    <ul>
+      <li>
+        <label for="url">URL to scan</label>
+        <input type="url" name="url" placeholder="http://spidie.mrfjo.org" required="" autofocus>
+      </li>
+      <li>
+        <input type="submit" value="Run FjoSpidie">
+      </li>
+    </ul>
+  </form>
+</section>
+</div>
+<div class="row">
+[% INCLUDE reports/reports.tt2 %]
+</div>
