@@ -1,5 +1,4 @@
 <table class="table table-striped table-bordered table-hover reports">
-  <caption>test</caption>
   <thead>
     <th>URL</th>
     <th>Start Time</th>

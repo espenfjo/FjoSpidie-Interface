@@ -7,6 +7,8 @@ extends 'Catalyst::View::TT';
 __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt2',
     render_die         => 1,
+    TIMER              => 1,
+    DEBUG              => 'all',
 
     # This is your wrapper template located in the 'root/src'
     WRAPPER => 'layouts/layout.tt2',

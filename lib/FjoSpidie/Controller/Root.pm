@@ -26,13 +26,10 @@ The root page (/)
 
 =cut
 
-sub login : Path : Args(0) {
+sub index : Path : Args(0) {
     my ( $self, $c ) = @_;
-    $c->load_status_msgs;
 
-    $c->stash( message => "Welcome to the FjoSpidie honey spider!" );
-    $c->stash->{wrapper} = 'layouts/loginLayout.tt2';
-
+    $c->stash( reports => [ $c->model('DB')->reports() ] );
 }
 
 =head2 auto
@@ -41,8 +38,9 @@ Check if there is a user and, if not, forward to login page
 
 =cut
 
-# Note that 'auto' runs after 'begin' but before your actions and that
-# 'auto's "chain" (all from application path to most specific class are run)
+# Note that ' auto ' runs after ' begin ' but before your actions and that
+# ' auto's "chain" ( all from application path to most specific class are run )
+
 # See the 'Actions' section of 'Catalyst::Manual::Intro' for more info.
 sub auto : Private {
     my ( $self, $c ) = @_;
@@ -53,8 +51,10 @@ sub auto : Private {
     #   if ($c->action eq $c->controller('Login')->action_for('index'))
     # to only allow unauthenticated access to the 'index' action we
     # added above.
-    if (   $c->controller eq $c->controller('Root')
-        || $c->controller eq $c->controller('Login') )
+    if (   $c->controller eq $c->controller('Login')
+        || $c->controller eq $c->controller('Job')
+        || $c->controller eq $c->controller('Report')
+        || $c->controller eq $c->controller('Report::Graph') )
     {
         return 1;
     }
@@ -67,10 +67,10 @@ sub auto : Private {
             '***Root::auto User not found, forwarding to login page: /');
 
         # Redirect the user to the login page
-        $c->response->redirect( $c->uri_for('/') );
+        #        $c->response->redirect( $c->uri_for('/login') );
 
       # Return 0 to cancel 'post-auto' processing and prevent use of application
-        return 0;
+      #       return 0;
     }
 
     # User found, so return 1 to continue with processing after this 'auto'

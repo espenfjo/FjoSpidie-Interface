@@ -25,8 +25,10 @@ sub reports : Path : Args(0) {
 
     $c->stash(
         reports => [
-            $c->model('DB::Report')
-              ->search( { endtime => { '!=', "0000-00-00 00:00:00" } } )
+            $c->model('DB::Report')->search(
+                { endtime => { '!=', "0000-00-00 00:00:00" } },
+                { join    => 'alert' }
+            )
         ]
     );
 }

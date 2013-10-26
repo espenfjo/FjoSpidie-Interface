@@ -56,6 +56,14 @@ __PACKAGE__->config(
     },
 );
 
+sub dump_these {
+    my $c = shift;
+
+    my @variables = $c->next::method(@_);
+    return grep { $_->[0] ne 'Config' } @variables;
+
+}
+
 # Start the application
 __PACKAGE__->setup();
 

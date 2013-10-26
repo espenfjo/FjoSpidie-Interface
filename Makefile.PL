@@ -36,6 +36,9 @@ requires 'Catalyst::Plugin::Authentication::SimpleDB';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::Class::Cursor::Cached';
+requires 'Catalyst::Controller::REST';
+requires 'MooseX::Workers';
+requires 'Data::UUID';
 
 test_requires 'Test::More' => '0.88';
 catalyst;

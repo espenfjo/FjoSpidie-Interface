@@ -1,4 +1,4 @@
-package FjoSpidie::Controller::Download;
+package FjoSpidie::Controller::Report::Download;
 use Moose;
 use namespace::autoclean;
 
@@ -20,7 +20,7 @@ Catalyst Controller.
 
 =cut
 
-sub download : Path('/report/download') : Args(1) {
+sub download : Path : Args(1) {
     my ( $self, $c, $uuid ) = @_;
 
     my $res = $c->model('DB::Download')->search( uuid => $uuid )->single();

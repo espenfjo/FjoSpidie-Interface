@@ -1,6 +1,6 @@
 name FjoSpidie
 using_frontend_proxy 1
-
+fjospidie_runsh /home/fjospidie/run.sh
 <Plugin::Authentication>
  <default>
      user_model    DBUsers::Client

@@ -51,18 +51,23 @@ __PACKAGE__->table("report");
 
 =head2 starttime
 
-  data_type: 'bigint'
-  is_nullable: 1
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: '0000-00-00 00:00:00'
+  is_nullable: 0
 
 =head2 endtime
 
-  data_type: 'bigint'
-  is_nullable: 1
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: '0000-00-00 00:00:00'
+  is_nullable: 0
 
 =head2 uuid
 
-  data_type: 'blob'
+  data_type: 'varchar'
   is_nullable: 1
+  size: 36
 
 =cut
 
@@ -72,11 +77,21 @@ __PACKAGE__->add_columns(
   "url",
   { data_type => "blob", is_nullable => 1 },
   "starttime",
-  { data_type => "bigint", is_nullable => 1 },
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    default_value => "0000-00-00 00:00:00",
+    is_nullable => 0,
+  },
   "endtime",
-  { data_type => "bigint", is_nullable => 1 },
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    default_value => "0000-00-00 00:00:00",
+    is_nullable => 0,
+  },
   "uuid",
-  { data_type => "blob", is_nullable => 1 },
+  { data_type => "varchar", is_nullable => 1, size => 36 },
 );
 
 =head1 PRIMARY KEY
@@ -104,21 +119,6 @@ Related object: L<FjoSpidie::Schema::Result::Alert>
 __PACKAGE__->has_many(
   "alerts",
   "FjoSpidie::Schema::Result::Alert",
-  { "foreign.report_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 artifacts
-
-Type: has_many
-
-Related object: L<FjoSpidie::Schema::Result::Artifact>
-
-=cut
-
-__PACKAGE__->has_many(
-  "artifacts",
-  "FjoSpidie::Schema::Result::Artifact",
   { "foreign.report_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -184,8 +184,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-03-29 12:01:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AInwvFPeOb0UtoeR7HIJYw
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-07-12 16:57:53
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XZFWMvVP9c1dkMQYxH1x6A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

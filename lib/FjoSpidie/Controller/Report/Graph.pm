@@ -1,4 +1,4 @@
-package FjoSpidie::Controller::Graph;
+package FjoSpidie::Controller::Report::Graph;
 use Moose;
 use namespace::autoclean;
 
@@ -20,16 +20,16 @@ Catalyst Controller.
 
 =cut
 
-sub graph : Path('/report/graph') : Args(1) {
+sub graph : Path : Args(1) {
     my ( $self, $c, $uuid ) = @_;
-
     my $res =
       $c->model('DB::Graph')
       ->search( { 'report.uuid' => $uuid }, { join => 'report' } )->single();
-
-    my $img = $res->graph;
-    $c->res->content_type('image/png');
-    $c->res->body($img);
+    eval{
+	my $img = $res->graph;
+	$c->res->content_type('image/png');
+	$c->res->body($img);
+    };
 }
 __PACKAGE__->meta->make_immutable;
 

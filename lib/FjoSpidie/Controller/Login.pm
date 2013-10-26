@@ -22,6 +22,15 @@ Catalyst Controller.
 
 sub login : Path : Args(0) {
     my ( $self, $c ) = @_;
+    $c->load_status_msgs;
+
+    $c->stash( message => "Welcome to the FjoSpidie honey spider!" );
+    $c->stash->{wrapper} = 'layouts/loginLayout.tt2';
+
+}
+
+sub do_login : Path('/dologin') : Args(0) {
+    my ( $self, $c ) = @_;
 
     my $error;
 
@@ -43,8 +52,7 @@ sub login : Path : Args(0) {
         {
             # If successful, then let them use the application
             $c->response->redirect(
-                $c->uri_for( $c->controller('Reports')->action_for('reports') )
-            );
+                $c->uri_for( $c->controller('Root')->action_for('index') ) );
             return;
         }
         else {
@@ -52,7 +60,6 @@ sub login : Path : Args(0) {
             $error = "Bad username or password.";
         }
     }
-
     else {
         # Set an error message
         $error = "Empty username or password." unless ( $c->user_exists );
@@ -60,14 +67,9 @@ sub login : Path : Args(0) {
     }
 
     # If either of above don't work out, send to the login page
-    #    $c->response->redirect( $c->uri_for( $c->controller('Root') ) );
-
     $c->flash( message => "Welcome to the FjoSpidie honey spider!" );
-
-#    $c->response->redirect({mid => $c->set_error_msg("Error deleting widget")}));
-
     $c->response->redirect(
-        $c->uri_for( '/', { mid => $c->set_error_msg($error) } ) );
+        $c->uri_for( '/login', { mid => $c->set_error_msg($error) } ) );
 
 }
 

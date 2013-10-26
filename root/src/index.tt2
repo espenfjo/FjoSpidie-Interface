@@ -1,18 +1,16 @@
-<div class="row">
-<section class="urlform cf form">
-  <form id="urlform" action="/job" name="url" method="post" accept-charset="utf-8">
-    <ul>
-      <li>
-        <label for="url">URL to scan</label>
-        <input type="url" name="url" placeholder="http://spidie.mrfjo.org" required="" autofocus>
-      </li>
-      <li>
-        <input type="submit" value="Run FjoSpidie">
-      </li>
-    </ul>
-  </form>
-</section>
+<div class="row"> 
+  <section class="cf form">
+    <div class="col-lg-12">
+      <label for="url">URL to scan</label>
+      <div class="input-group">      
+        <input class="form-control" type="url" id="url" name="url" placeholder="http://www.google.com" required="" autofocus>
+        <span class="input-group-btn">
+          <button type="button" class="btn btn-default">Run FjoSpidie</button>
+        </span>
+      </div>
+    </div>
+  </section>
 </div>
 <div class="row">
-[% INCLUDE reports/reports.tt2 %]
+  [% INCLUDE reports/reports.tt2 %]
 </div>

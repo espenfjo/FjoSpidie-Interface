@@ -76,6 +76,16 @@ __PACKAGE__->table("request");
   data_type: 'blob'
   is_nullable: 1
 
+=head2 host
+
+  data_type: 'blob'
+  is_nullable: 1
+
+=head2 port
+
+  data_type: 'mediumint'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -93,6 +103,10 @@ __PACKAGE__->add_columns(
   { data_type => "blob", is_nullable => 1 },
   "httpversion",
   { data_type => "blob", is_nullable => 1 },
+  "host",
+  { data_type => "blob", is_nullable => 1 },
+  "port",
+  { data_type => "mediumint", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -125,8 +139,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-03-29 12:01:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Wqk5aSa5zYb+G+2SbLrrlg
+# Created by DBIx::Class::Schema::Loader v0.07035 @ 2013-07-12 17:54:33
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RK9XjHHI3kpkPprx1/FlSQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
