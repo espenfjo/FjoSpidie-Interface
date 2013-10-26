@@ -5,8 +5,8 @@ It is based on Perl and Catalyst MVC.
 
 Building
 ========
-perl Makefile.PL
-make
+`perl Makefile.PL`
+`make`
 
 Usage
 =====
