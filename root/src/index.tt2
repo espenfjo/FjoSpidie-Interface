@@ -5,7 +5,7 @@
       <div class="input-group">      
         <input class="form-control" type="url" id="url" name="url" placeholder="http://www.google.com" required="" autofocus>
         <span class="input-group-btn">
-          <button type="button" class="btn btn-default">Run FjoSpidie</button>
+          <button type="button" id="submit-url" class="btn btn-default">Run FjoSpidie</button>
         </span>
       </div>
     </div>
