@@ -1,35 +1,11 @@
 var failed = false;
 
+var active;
+
 var blocked = false;
 
 $(document).ready(function() {
-    $("#submit-url").on("click", function() {
-        console.info("Posting");
-        var form = $(this);
-        term = form.find('input[name="s"]').val();
-        url = "/job";
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $("#url").serialize(),
-            async: false,
-            success: function(response) {
-                console.info("Posted");
-                console.info("uuid: " + response.uuid);
-                window.location.href = "/report/" + response.uuid;
-            },
-            error: function() {
-                console.info("fuck off");
-            }
-        });
-    });
-    $("#login").submit(function() {
-        return login();
-    });
-    $("th.hheader").click(function() {
-        showAll();
-    });
-    var lol = 0;
+    setupListeners();
     $.ajaxSetup({
         timeout: 1,
         retryAfter: 2e3
@@ -51,8 +27,51 @@ $(document).ready(function() {
             }
         }
     });
-    var active;
     $("div.headers").hide();
+    hideAllMessages();
+    showMessage();
+});
+
+function setupListeners() {
+    $("#submit-advanced").on("click", function() {
+        $("#advanced-inputs").toggle();
+        if ($("#advanced-inputs").is(":visible")) {
+            $("#advanced-caret").removeClass("right-caret").addClass("caret");
+        } else {
+            $("#advanced-caret").addClass("right-caret").removeClass("caret");
+        }
+    });
+    $("#submit-url").on("click", function() {
+        console.info("Posting");
+        var form = $(this);
+        term = form.find('input[name="s"]').val();
+        url = "/job";
+        var data = {
+            useragent: $("#useragent").val(),
+            ref: $("#referer").val(),
+            url: $("#url").val()
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            async: false,
+            success: function(response) {
+                window.location.href = "/report/" + response.uuid;
+                console.info("Posted");
+                console.info("uuid: " + response.uuid);
+            },
+            error: function() {
+                console.info("Can not send JOB");
+            }
+        });
+    });
+    $("#login").submit(function() {
+        return login();
+    });
+    $("th.hheader").click(function() {
+        showAll();
+    });
     $("tr.connection").click(function() {
         var data = $(this).find("div.headers");
         console.info(data);
@@ -62,7 +81,21 @@ $(document).ready(function() {
         data.toggle();
         active = data;
     });
-});
+    $(".error").click(function() {
+        $(this).animate({
+            top: -$(this).outerHeight()
+        }, 500);
+        $(".container").animate({
+            top: "-=80px"
+        }, 500);
+    });
+    $("tr.report").click(function() {
+        $.blockUI({
+            message: '<h2><img src="/static/images/busy.gif" /> Loading report...</h2>'
+        });
+        window.location.assign($(this).find("td").attr("rel"));
+    });
+}
 
 function showAll() {
     $("tr.connection").each(function(index) {
@@ -118,22 +151,3 @@ function showMessage(type) {
         }, 500);
     }
 }
-
-$(document).ready(function() {
-    hideAllMessages();
-    showMessage();
-    $(".error").click(function() {
-        $(this).animate({
-            top: -$(this).outerHeight()
-        }, 500);
-        $(".container").animate({
-            top: "-=80px"
-        }, 500);
-    });
-    $("tr.report").click(function() {
-        $.blockUI({
-            message: '<h2><img src="/static/images/busy.gif" /> Loading report...</h2>'
-        });
-        window.location.assign($(this).find("td").attr("rel"));
-    });
-});

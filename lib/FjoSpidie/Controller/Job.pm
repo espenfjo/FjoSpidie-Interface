@@ -32,7 +32,9 @@ sub job_GET {
 
     my $report = $c->model('DB::Report')->find( { uuid => $uuid } );
     if ($report) {
-        if ( $report->endtime =~ /0000-00-00 00:00:00/ || ! defined $report->endtime) {
+        if ( $report->endtime =~ /0000-00-00 00:00:00/
+            || !defined $report->endtime )
+        {
             $self->status_found( $c, entity => {} );
         }
         else {
@@ -48,20 +50,31 @@ sub job_GET {
 
 sub job_POST {
     my ( $self, $c ) = @_;
-    my $url;
+    my ( $url, $referer, $ua );
+    use Data::Dumper;
+
+    $c->log->debug( Dumper( $c->req->data ) );
+    $c->log->debug( Dumper( $c->request->params ) );
 
     eval {
         $url = $c->request->params->{url};
         $url ||= $c->req->data->{url};
+
+        $referer = $c->request->params->{ref};
+        $referer ||= $c->req->data->{ref};
+
+        $ua = $c->request->params->{useragent};
+        $ua ||= $c->req->data->{useragent};
+
         1;
     };
-    $c->log->debug( "URL " . $url );
 
     my $command = $c->config->{fjospidie_runsh};
     my $ug      = Data::UUID->new();
     my $uuid    = lc( $ug->create_str() );
+    $c->log->debug( "URL " . $url . " REF: " . $referer . " UA: " . $ua );
 
-    $self->run( $c, $command, $url, $uuid );
+    $self->run( $c, $command, $url, $referer, $ua, $uuid );
 
     $self->status_created(
         $c,
@@ -79,9 +92,15 @@ sub run {
     my $c       = shift;
     my $command = shift;
     my $url     = shift;
+    my $referer = shift;
+    my $ua      = shift;
     my $uuid    = shift;
 
-    my @command = ( $command, "--url", "'$url'", "--uuid", $uuid );
+    my @command = (
+        $command, "--url",       "'$url'", "--uuid",
+        $uuid,    "--useragent", "'$ua'",  "--referer",
+        "'$referer'"
+    );
     eval {
         local $SIG{ALRM} = sub { die "timeout\n" };
         alarm(300);
