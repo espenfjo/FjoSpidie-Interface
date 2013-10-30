@@ -98,10 +98,12 @@ sub run {
 
     my @command = ( $command, "--url", "'$url'", "--uuid", $uuid );
     if ($referer) {
-        push( @command, "'$referer'" );
+        push( @command, "--referer" );
+        push( @command, "\\\"'$referer'\\\"" );
     }
     if ($ua) {
-        push( @command, "'$ua'" );
+        push( @command, "--useragent" );
+        push( @command, "\\\"'$ua'\\\"" );
     }
     eval {
         local $SIG{ALRM} = sub { die "timeout\n" };
