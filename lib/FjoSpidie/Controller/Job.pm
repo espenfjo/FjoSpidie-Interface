@@ -96,11 +96,13 @@ sub run {
     my $ua      = shift;
     my $uuid    = shift;
 
-    my @command = (
-        $command, "--url",       "'$url'", "--uuid",
-        $uuid,    "--useragent", "'$ua'",  "--referer",
-        "'$referer'"
-    );
+    my @command = ( $command, "--url", "'$url'", "--uuid", $uuid );
+    if ($referer) {
+        push( @command, "'$referer'" );
+    }
+    if ($ua) {
+        push( @command, "'$ua'" );
+    }
     eval {
         local $SIG{ALRM} = sub { die "timeout\n" };
         alarm(300);
