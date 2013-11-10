@@ -1,0 +1,79 @@
+{% extends "layouts/full.html" %}
+{% block content %}
+<div id="report">
+
+  <h2>Checked {{ report.url }}</h2>
+
+  <h2>Snort VRT w/Emerging Threats</h2>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <th style="text-align:center" width="125px">Timestamp</th>
+      <th style="text-align:center" width="110px">Source IP</th>
+      <th style="text-align:center" width="110px">Destination IP</th>
+      <th style="text-align:center" width="60px">Severity</th>
+      <th style="text-align:left">Alert</th>
+    </thead>
+    <tbody>
+      {% for alert in alerts %}
+      <tr>
+        <td>{{ alert.time }}</td>
+        <td>{{ alert.from_ip }}</td>
+        <td>{{ alert.to_ip }}</td>
+        <td class="alarm{{ alert.priority }}" > {{ alert.priority }}</td>
+        <td>{{ alert.alarm_text }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2>HTTP Connections</h2>
+      <a class="fancybox-thumb" rel="fancybox-thumb" href="graph/{{ report_id }}">
+        <img class="graph" src="graph/{{ report_id }}" />
+      </a>
+    </div>
+    <div class="col-md-6">
+      <h2>Screenshot</h2>
+      <a class="fancybox-thumb" rel="fancybox-thumb" href="screenshot/{{ report_id }}">
+        <img class="graph" src="screenshot/{{ report_id }}" />
+      </a>
+    </div>
+  </div>
+  {% if downloads and downloads|length > 0 %}
+  <h2>Files Downloaded</h2>
+  {% include 'report/downloads.html' %}
+  {% endif %}
+
+  <h2>PCAP</h2>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <th>Size</th>
+      <th>Download</th>
+    </thead>
+    <tbody>
+      <tr class="even connection wrapword">
+        <td>
+          {{ pcap }} Bytes
+        </td>
+        <td>
+          <a download="{{ report.uuid }}.pcap" href="pcap">Click here</a>
+        </td>            
+      </tr>
+    </tbody>
+  </table>
+  
+  <h2>HTTP Headers</h2>
+  <table class="table table-striped table-bordered table-hover headers">
+    <thead>
+      <th class="hheader" style="text-align:center">Request</th>
+      <th class="hheader" style="text-align:center">Response</th>
+    </thead>
+    <tbody>
+      {% autoescape off %}{{ headers }}{% endautoescape %}
+        </td>          
+      </tr>
+    </tbody>
+  </table> 
+</div>
+{% endblock %}

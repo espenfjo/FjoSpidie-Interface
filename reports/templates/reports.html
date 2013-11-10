@@ -1,0 +1,23 @@
+      <table class="table table-striped table-bordered table-hover reports">
+        <thead>
+          <th>URL</th>
+          <th>Start Time</th>
+          <th>Alerts</th>
+        </thead>
+        <tbody>
+          {% for report in reports %}
+          {{report.counter0}}
+          <tr class="{% if forloop.counter0|divisibleby:"3" %}even{% else %}odd{% endif %} report">
+            <td rel="{{ report.uuid }}">
+              {{ report.url }}
+            </td>
+            <td>
+              {{ report.starttime }}
+            </td>
+            <td>
+              {{ report.alerts }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>

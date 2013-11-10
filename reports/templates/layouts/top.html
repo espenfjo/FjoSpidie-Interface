@@ -1,0 +1,48 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'fancybox/source/jquery.fancybox.css' %}">
+    <link rel="stylesheet" href="{% static 'css/spidie.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    
+  </head>
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">Fjospidie</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="/">Reports</a></li>
+              <li><a href="/about">About</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <span class="nav navbar-nav"><li><a href="/logout">Log out</a></li></span>
+            </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+    <div class="container">      
+    </div>
+    <div id="footer">
+      <div class="container">
+      
+        <p class="muted credit">Courtesy of <a href="mailto://espen@mrfjo.org">Espen Fjellv&aelig;r Olsen</a>.</p>
+      </div>
+    </div>
+    <script src="{% static 'js/jquery-1.9.1.js' %}"></script>
+    <script src="{% static 'js/jquery.blockUI.js' %}"></script>
+    <script src="{% static 'fancybox/source/jquery.fancybox.pack.js' %}"></script>
+    <script src="{% static 'js/spidie.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  </body>
+</html>
