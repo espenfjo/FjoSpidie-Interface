@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.views import generic
 from django.db import connection
 import sys
+import collections
 from reports.models import Report, Alert, Download, Entry, Graph, Pcap, Screenshot
 from django.db.models import Count, Sum
 
@@ -132,7 +133,7 @@ def headers(uuid):
 
     cursor.execute(statement, [uuid])
     records = cursor.fetchall()
-    data = {}
+    data = collections.OrderedDict()
 
     for header in records:
         id           = header[0]
