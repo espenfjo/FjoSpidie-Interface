@@ -88,23 +88,24 @@ input {
     width: 400px;
 }
 
-tr.report{
+tr.report,
+tr.alert {
     cursor: pointer;
 }
 
 .table tbody > tr.suspicious:nth-child(odd) > td,
 .table tbody > tr.suspicious:nth-child(odd) > th {
-  background-color: orange;
+  background-color: #f2dede;
 }
 
 .table tbody tr.suspicious:hover > td,
 .table tbody tr.suspicious:hover > th {
-  background-color: #FF9900;
+  background-color: #ebcccc;
 }
 
 tr.suspicious {
 
-    background-color: orange;
+    background-color: #f2dede;
 }
 table{
     table-layout: auto;

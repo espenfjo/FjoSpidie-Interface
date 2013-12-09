@@ -30,6 +30,10 @@ $(document).ready(function() {
     $("div.headers").hide();
     hideAllMessages();
     showMessage();
+    $('.alert').each(function(){
+        var rel = $(this).attr('rel');
+        $('#' + rel).addClass("suspicious alert alert-error");
+    });
 });
 
 function setupListeners() {
@@ -95,6 +99,14 @@ function setupListeners() {
         });
         window.location.assign($(this).find("td").attr("rel"));
     });
+
+    $("tr.alert").click(function() {
+        var aid = $(this).attr('rel');
+        $('html, body').animate({ scrollTop: $('#' + aid ).offset().top -120 }, 'slow');
+        $('#' + aid).click();
+
+    });
+
 }
 
 function showAll() {

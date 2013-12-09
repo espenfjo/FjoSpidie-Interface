@@ -18,7 +18,7 @@ class IndexView(generic.ListView):
     
     def get_queryset(self):
         cursor = connection.cursor()
-        statement = "SELECT r.id, r.url, r.uuid, r.starttime, count(a.id) as alerts FROM report r LEFT JOIN alert a ON a.report_id = r.id WHERE r.endtime IS NOT NULL GROUP BY r.id ORDER BY r.starttime DESC";
+        statement = "SELECT r.id, r.url, r.uuid, r.starttime, count(a.id)  as alerts FROM report r LEFT JOIN alert a ON a.report_id = r.id WHERE r.endtime IS NOT NULL GROUP BY r.id ORDER BY r.starttime DESC";
 
         cursor.execute(statement)
         records = cursor.fetchall()
@@ -100,7 +100,7 @@ def report(request, uuid):
 def headers_html(headers):
     html = ""
     for key,header in headers.items():
-        html+="""<tr class="connection">
+        html+="""<tr id='""" + str(header['rid']) + """' class="connection">
         <td class="headers">
           <b>"""
         html += header['method'] + " " + header['uri'] + " " + header['rhttpversion']
@@ -129,7 +129,7 @@ def headers(uuid):
     from time import time
     start = time()
     cursor = connection.cursor()
-    statement = "SELECT me.id, me.entry_id, me.name, me.value, me.type, requests.host, requests.port, responses.httpversion, responses.statustext, responses.status, responses.bodysize, responses.headersize, requests.bodysize, requests.headersize, requests.method, requests.uri, requests.httpversion FROM header me JOIN entry entry ON entry.id = me.entry_id JOIN report report ON report.id = entry.report_id LEFT JOIN response responses ON responses.entry_id = entry.id LEFT JOIN request requests ON requests.entry_id = entry.id WHERE ( report.uuid = %s ) ORDER BY requests.id ASC";
+    statement = "SELECT me.id, me.entry_id, me.name, me.value, me.type, requests.host, requests.port, responses.httpversion, responses.statustext, responses.status, responses.bodysize, responses.headersize, requests.bodysize, requests.headersize, requests.method, requests.uri, requests.httpversion, requests.id FROM header me JOIN entry entry ON entry.id = me.entry_id JOIN report report ON report.id = entry.report_id LEFT JOIN response responses ON responses.entry_id = entry.id LEFT JOIN request requests ON requests.entry_id = entry.id WHERE ( report.uuid = %s ) ORDER BY requests.id ASC";
 
     cursor.execute(statement, [uuid])
     records = cursor.fetchall()
@@ -149,9 +149,10 @@ def headers(uuid):
         method       = header[14]
         uri          = header[15]
         rhttpversion = header[16]
+        rid          = header[17]
 
         if not entry_id in data:
-            data[entry_id] ={ 'entry_id':entry_id, 'status':status,  'host':host, 'port':port, 'method':method, 'uri':uri, 'rhttpversion':rhttpversion, 'statustext':statustext, 'httpversion':httpversion, 'request_header':[], 'response_header':[]}
+            data[entry_id] ={ 'entry_id':entry_id, 'status':status,  'host':host, 'port':port, 'method':method, 'uri':uri, 'rhttpversion':rhttpversion, 'statustext':statustext, 'httpversion':httpversion, 'request_header':[], 'response_header':[], 'rid': rid}
 
         for d in data:
             if data[d]['entry_id'] == entry_id:

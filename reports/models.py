@@ -21,6 +21,9 @@ class Alert(models.Model):
     from_ip = models.TextField(blank=True)
     to_ip = models.TextField(blank=True)
     time  = models.TextField(blank=True)
+    request = models.ForeignKey('Request', blank=True, null=True, db_column="request")
+    http_method = models.TextField(blank=True)
+    http_request = models.TextField(blank=True)
     class Meta:
         managed = False
         db_table = 'alert'

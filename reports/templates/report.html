@@ -15,7 +15,7 @@
     </thead>
     <tbody>
       {% for alert in alerts %}
-      <tr>
+      <tr rel="{{ alert.request.id }}" class="alert">
         <td>{{ alert.time }}</td>
         <td>{{ alert.from_ip }}</td>
         <td>{{ alert.to_ip }}</td>
