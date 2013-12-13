@@ -15,7 +15,7 @@ import uuid
 class IndexView(generic.ListView):
     template_name = 'index.html'
     context_object_name = 'reports'
-    
+
     def get_queryset(self):
         cursor = connection.cursor()
         statement = "SELECT r.id, r.url, r.uuid, r.starttime, count(a.id)  as alerts FROM report r LEFT JOIN alert a ON a.report_id = r.id WHERE r.endtime IS NOT NULL GROUP BY r.id ORDER BY r.starttime DESC";
