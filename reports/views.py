@@ -57,7 +57,10 @@ def pcap_size( rid ):
 
     cursor.execute(statement, [rid])
     records = cursor.fetchall()
-    return records[0][0]
+    if records:
+        return records[0][0]
+    else:
+        return None
 
 def graph(request, uuid):
     r = get_object_or_404(Report, uuid=uuid)
@@ -109,7 +112,7 @@ def headers_html(headers):
           </b>
           <div class="headers">"""
         for request_headers in header['request_header']:
-            html +="<b> {}: </b>{} <br>".format(request_headers['name'],request_headers['value'])
+            html += u"<b> {}: </b>{} <br>".format(request_headers['name'],request_headers['value'])
         html += """</div>
         </td>
         <td class="headers">
@@ -120,8 +123,8 @@ def headers_html(headers):
           </b>
           <div class="headers">"""
         for response in header['response_header']:
-            html +="""<b>{}: </b> {} <br>""".format(response['name'], response['value'])
-        html +="""</div>"""
+            html +=u"<b>{}: </b> {} <br>".format(response['name'], response['value'])
+        html +="</div>"
 
     return html
 
