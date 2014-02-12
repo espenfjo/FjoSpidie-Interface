@@ -1,6 +1,5 @@
 import sys
 import docker
-import codecs
 from django.utils.encoding import smart_str
 
 def job(uuid, url, useragent, referer):
