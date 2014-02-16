@@ -107,6 +107,13 @@ function setupListeners() {
 
     });
 
+    $(".signature").click(function() {
+        var sid = $(this).attr('rel');
+        $('html, body').animate({ scrollTop: $('#' + sid ).offset().top -120 }, 'slow');
+        $('#' + sid).click();
+
+    });
+
 }
 
 function showAll() {

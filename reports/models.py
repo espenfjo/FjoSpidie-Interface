@@ -20,16 +20,115 @@ class Alert(models.Model):
     protocol = models.CharField(max_length=10, blank=True)
     from_ip = models.TextField(blank=True)
     to_ip = models.TextField(blank=True)
-    time  = models.TextField(blank=True)
-    request = models.ForeignKey('Request', blank=True, null=True, db_column="request")
+    time = models.TextField(blank=True)
+    request = models.ForeignKey('Request', db_column='request', blank=True, null=True)
     http_method = models.TextField(blank=True)
     http_request = models.TextField(blank=True)
     class Meta:
         managed = False
         db_table = 'alert'
-    def __unicode__(self):
-        return "{} {} {} {} {}".format(self.alarm_text, self.from_ip,self.to_ip,self.protocol,self.classification)
-        
+
+class AuthGroup(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=80)
+    class Meta:
+        managed = False
+        db_table = 'auth_group'
+
+class AuthGroupPermissions(models.Model):
+    id = models.IntegerField(primary_key=True)
+    group = models.ForeignKey(AuthGroup)
+    permission = models.ForeignKey('AuthPermission')
+    class Meta:
+        managed = False
+        db_table = 'auth_group_permissions'
+
+class AuthPermission(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=50)
+    content_type = models.ForeignKey('DjangoContentType')
+    codename = models.CharField(max_length=100)
+    class Meta:
+        managed = False
+        db_table = 'auth_permission'
+
+class AuthUser(models.Model):
+    id = models.IntegerField(primary_key=True)
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField()
+    is_superuser = models.BooleanField()
+    username = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.CharField(max_length=75)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    date_joined = models.DateTimeField()
+    class Meta:
+        managed = False
+        db_table = 'auth_user'
+
+class AuthUserGroups(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user = models.ForeignKey(AuthUser)
+    group = models.ForeignKey(AuthGroup)
+    class Meta:
+        managed = False
+        db_table = 'auth_user_groups'
+
+class AuthUserUserPermissions(models.Model):
+    id = models.IntegerField(primary_key=True)
+    user = models.ForeignKey(AuthUser)
+    permission = models.ForeignKey(AuthPermission)
+    class Meta:
+        managed = False
+        db_table = 'auth_user_user_permissions'
+
+class Cookie(models.Model):
+    id = models.IntegerField(primary_key=True)
+    response = models.ForeignKey('Response', blank=True, null=True)
+    name = models.TextField(blank=True)
+    value = models.BinaryField(blank=True, null=True)
+    path = models.TextField(blank=True)
+    domain = models.TextField(blank=True)
+    expires = models.TextField(blank=True)
+    httponly = models.TextField(blank=True)
+    secure = models.TextField(blank=True)
+    comment = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'cookie'
+
+class DjangoAdminLog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    action_time = models.DateTimeField()
+    user = models.ForeignKey(AuthUser)
+    content_type = models.ForeignKey('DjangoContentType', blank=True, null=True)
+    object_id = models.TextField(blank=True)
+    object_repr = models.CharField(max_length=200)
+    action_flag = models.SmallIntegerField()
+    change_message = models.TextField()
+    class Meta:
+        managed = False
+        db_table = 'django_admin_log'
+
+class DjangoContentType(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    class Meta:
+        managed = False
+        db_table = 'django_content_type'
+
+class DjangoSession(models.Model):
+    session_key = models.CharField(max_length=40)
+    session_data = models.TextField()
+    expire_date = models.DateTimeField()
+    class Meta:
+        managed = False
+        db_table = 'django_session'
+
 class Download(models.Model):
     id = models.IntegerField(primary_key=True)
     report = models.ForeignKey('Report')
@@ -62,25 +161,6 @@ class Graph(models.Model):
     class Meta:
         managed = False
         db_table = 'graph'
-    def __unicode__(self):
-        if graph:            
-            return "We have a graph, wont print it here..."
-        else:
-            return "No graph.. :("
-
-class Screenshot(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey('Report')
-    image = models.BinaryField(blank=True, null=True)
-    class Meta:
-        managed = False
-        db_table = 'screenshot'
-    def __unicode__(self):
-        if graph:            
-            return "We have a screenshot, wont print it here..."
-        else:
-            return "No screenshot.. :("
-
 
 class Header(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -91,8 +171,6 @@ class Header(models.Model):
     class Meta:
         managed = False
         db_table = 'header'
-    def __unicode__(self):
-        return "{} {}".format(self.name, self.value)
 
 class Pcap(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -102,8 +180,6 @@ class Pcap(models.Model):
     class Meta:
         managed = False
         db_table = 'pcap'
-    def __unicode__(self):
-        return self.uuid
 
 class Report(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -114,8 +190,6 @@ class Report(models.Model):
     class Meta:
         managed = False
         db_table = 'report'
-    def __unicode__(self):
-        return "{} {} {} {}".format(self.url, self.starttime, self.endtime, self.uuid)
 
 class Request(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -130,8 +204,6 @@ class Request(models.Model):
     class Meta:
         managed = False
         db_table = 'request'
-    def __unicode__(self):
-        return "{} {} {} {} {} {} {}".format(self.method, self.uri, self.httpversion,self.host,self.port,self.headersize,self.bodysize)
 
 class Response(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -141,9 +213,53 @@ class Response(models.Model):
     status = models.IntegerField(blank=True, null=True)
     bodysize = models.IntegerField(blank=True, null=True)
     headersize = models.IntegerField(blank=True, null=True)
+    content = models.BinaryField(blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'response'
-    def __unicode__(self):
-        return "{} {} {} {} {} ".format(self.status, self.statustext, self.httpversion, self.bodysize,self.headersize)
+
+class ResponseContent(models.Model):
+    id = models.IntegerField(primary_key=True)
+    response = models.ForeignKey(Response, blank=True, null=True)
+    md5 = models.TextField(blank=True)
+    data = models.TextField(blank=True)
+    size = models.IntegerField(blank=True, null=True)
+    path = models.TextField(blank=True)
+    mimetype = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'response_content'
+
+class Screenshot(models.Model):
+    id = models.IntegerField(primary_key=True)
+    report = models.ForeignKey(Report, blank=True, null=True)
+    image = models.BinaryField(blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'screenshot'
+
+class Yara(models.Model):
+    id = models.IntegerField(primary_key=True)
+    content = models.ForeignKey(ResponseContent, blank=True, null=True)
+    rule = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'yara'
+
+class YaraString(models.Model):
+    id = models.IntegerField(primary_key=True)
+    yara = models.ForeignKey(Yara, blank=True, null=True)
+    string = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'yara_string'
+
+class YaraTag(models.Model):
+    id = models.IntegerField(primary_key=True)
+    yara = models.ForeignKey(Yara, blank=True, null=True)
+    tag = models.TextField(blank=True)
+    class Meta:
+        managed = False
+        db_table = 'yara_tag'
 

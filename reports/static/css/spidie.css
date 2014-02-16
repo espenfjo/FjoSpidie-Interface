@@ -147,3 +147,10 @@ img.graph {
 .container .credit {
     margin: 20px 0;
 }
+
+.signature {
+    padding: 5px;
+    padding-left: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}

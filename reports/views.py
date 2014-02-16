@@ -7,7 +7,7 @@ import sys
 import collections
 from reports.models import Report, Alert, Download, Entry, Graph, Pcap, Screenshot
 from django.db.models import Count, Sum
-
+from django.utils.encoding import smart_text
 from reports.forms import JobForm
 from reports.jobs import job
 import uuid
@@ -90,12 +90,14 @@ def report(request, uuid):
     if not r.endtime:
         raise Http404
 
+    yara = yara_matches(r.uuid)
     data = {
         'report':    r,
         'alerts':    Alert.objects.filter(report=r.id),
         'downloads': Download.objects.filter(report=r.id),
         'headers':   headers_html(headers(r.uuid)),
-        'pcap':      pcap_size(r.id)
+        'pcap':      pcap_size(r.id),
+        'yaras':     yara
     }
 
     return render(request, 'report.html', data )
@@ -127,6 +129,25 @@ def headers_html(headers):
         html +="</div>"
 
     return html
+
+
+def yara_matches(uuid):
+    statement ="SELECT y.id, y.rule, y.description, r.id, request.id FROM yara y JOIN response_content rc on y.content_id = rc.id JOIN response r ON rc.response_id=r.id JOIN entry e ON r.entry_id = e.id JOIN report on e.report_id=report.id LEFT JOIN request ON request.entry_id = e.id WHERE ( report.uuid = %s )"
+    cursor = connection.cursor()
+
+    cursor.execute(statement, [uuid])
+    records = cursor.fetchall()
+    data = []
+    for match in records:
+        id          = match[0]
+        rule        = match[1]
+        description = match[2]
+        response_id = match[3]
+        request_id  = match[4]
+
+        data.append({'id': id, 'rule': rule, 'description': description, 'response_id':response_id, 'request_id':request_id })
+    return data
+
 
 def headers(uuid):
     from time import time
@@ -163,15 +184,4 @@ def headers(uuid):
                     data[d]['request_header'].append({'name':name,'value':value})
                 else:
                     data[d]['response_header'].append({'name':name,'value':value})
-    ec = 0
-    rc = 0
-    rs = 0
-    for e in data:
-        ec +=1
-        for k in data[e]['request_header']:
-            rc +=1
-        for k in data[e]['response_header']:
-            rs +=1
-
-    print "we have {} entries with {} reqs and {} resps".format(ec,rc,rs)
     return data

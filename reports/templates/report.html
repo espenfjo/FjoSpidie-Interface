@@ -25,7 +25,16 @@
       {% endfor %}
     </tbody>
   </table>
-
+  {% if yaras and yaras|length > 0 %}
+  <section id="signatures">
+    <h2>Yara signatures</h2>
+    {% for yara in yaras %}
+      <div class="alert alert-danger signature" id="#signature_{{ yara.rule }}" rel="{{ yara.request_id }}">
+        {{ yara.description }}
+      </div>
+    {% endfor %}
+  </section>
+  {% endif %}
   <div class="row">
     <div class="col-md-6">
       <h2>HTTP Connections</h2>
