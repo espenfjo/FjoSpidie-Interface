@@ -1,9 +1,10 @@
 {% extends "layouts/full.html" %}
 {% block content %}
 <div id="report">
-
+  {% if done == False %}
+  <!-- Done:{{ done }} -->
+  {% endif %}
   <h2>Checked {{ report.url }}</h2>
-
   <h2>Snort VRT w/Emerging Threats</h2>
   <table class="table table-striped table-bordered table-hover">
     <thead>

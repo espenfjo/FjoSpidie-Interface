@@ -130,23 +130,28 @@ function checkIfFinished() {
         async: false,
         cache: false,
         contentType: "application/json",
-        success: function() {
-            console.info("Success");
-            if (failed === true) {
-                failed = false;
-                window.document.location.reload(true);
+        success: function(data) {
+            if (data.match(/Done:False/)){
+                console.info("Not done");
+                if (blocked === false) {
+                    $.blockUI({
+                        message: '<h1><img src="/static/images/busy.gif" /> Running FjoSpidie...</h1>'
+                    });
+                    blocked = true;
+                }
+                failed = true;
+                setTimeout(checkIfFinished, 2e3);
+
+            } else {
+                if(failed === true){
+                    console.info("done");
+                    $.unblockUI();
+                    location.reload();
+                }
             }
-            $.unblockUI();
         },
-        error: function(data, textStatus) {
-            if (blocked === false) {
-                $.blockUI({
-                    message: '<h1><img src="/static/images/busy.gif" /> Running FjoSpidie...</h1>'
-                });
-                blocked = true;
-            }
+        error: function(data){
             failed = true;
-            console.info("Failed: " + textStatus);
             setTimeout(checkIfFinished, 2e3);
         }
     });

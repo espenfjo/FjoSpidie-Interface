@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from django.views import generic
@@ -32,6 +32,16 @@ class IndexView(generic.ListView):
                 'alerts':report[4],
             })
         return data
+
+    def post(self, *args, **kwargs):
+        form = JobForm(self.request.POST)
+        if form.is_valid():
+            uid = uuid.uuid4()
+            job(uid, form.cleaned_data['url'], form.cleaned_data['useragent'], form.cleaned_data['referer'])
+            return HttpResponseRedirect(reverse('report', args=[uid]))
+
+        else:
+            print form
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
@@ -77,16 +87,10 @@ def screenshot(request, uuid):
     return response
 
 def report(request, uuid):
-    if request.method == 'POST':
-        form = JobForm(request.POST)
-        if form.is_valid():
-            job(uuid, form.cleaned_data['url'], form.cleaned_data['useragent'], form.cleaned_data['referer'])
-            return render(request, 'report.html', {})
-        else:
-            print form
-    else:
-        r = get_object_or_404(Report, uuid=uuid)
-
+    try:
+        r = Report.objects.get(uuid=uuid)
+    except Report.DoesNotExist:
+        return render(request, 'report.html', {'done':False} )
     if not r.endtime:
         raise Http404
 
