@@ -142,17 +142,14 @@ class Download(models.Model):
     class Meta:
         managed = False
         db_table = 'download'
-    def __unicode__(self):
-        return "{} {} {} {} {} {}".format(self.filename, self.size, self.md5, self.sha1, self.sha256, self.uuid)
 
 class Entry(models.Model):
     id = models.IntegerField(primary_key=True)
     report = models.ForeignKey('Report')
+    url = models.TextField(blank=True)
     class Meta:
         managed = False
         db_table = 'entry'
-    def __unicode__(self):
-        return str(self.id)
 
 class Graph(models.Model):
     id = models.IntegerField(primary_key=True)
