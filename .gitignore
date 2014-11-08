@@ -1,1 +1,8 @@
 *.pyc
+blib
+fjospidie.conf
+MYMETA*
+META*
+Makefile
+Makefile.old
+pm_to_blib

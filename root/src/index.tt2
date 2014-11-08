@@ -1,0 +1,25 @@
+<div class="row"> 
+  <section class="cf form">
+    <div class="col-lg-12">
+      <label for="url">URL to scan</label>
+      <div class="input-group">      
+        <input class="form-control" type="url" id="url" name="url" placeholder="http://www.google.com" required="" autofocus>
+        <span class="input-group-btn">
+          <button type="button" id="submit-url" class="btn btn-default">Run FjoSpidie</button>
+        </span>
+      </div>
+      <button type="button" id="submit-advanced" class="btn btn-default">Advanced<span id="advanced-caret" class="right-caret"></span></button>
+    </div>
+    <section id="advanced-inputs" style="display:none;">
+      <div class="col-lg-12">
+        <label for="referer">Referer</label>
+        <input class="form-control" type="url" id="referer" name="referer" value="http://www.google.com/search?q=hei+&oq=SUP&sourceid=firefox&ie=UTF-8">
+        <label for="useragent">User Agent</label>
+        <input class="form-control" type="text" id="useragent" name="useragent" value="Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2b5) Gecko/20091204 Firefox/3.6b5 Java/1.7.0_11">
+      </div>
+    </section>
+  </section>
+</div>
+<div class="row">
+  [% INCLUDE reports/reports.tt2 %]
+</div>

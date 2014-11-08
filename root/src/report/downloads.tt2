@@ -1,0 +1,34 @@
+<table class="table table-striped table-bordered table-hover">
+<thead>
+    <th>File name</th>
+    <th>Size</th>
+    <th>MD5</th>
+    <th>SHA1</th>
+    <th>SHA256</th>
+    <th>Download</th>
+  </thead>
+  <tbody>
+    [% FOREACH download IN downloads %]
+    <tr class="[% IF loop.index % 2 %]even[% ELSE %]odd[% END %] connection wrapword">
+      <td>
+        [% download.filename %]
+      </td>
+      <td>
+        [% download.size %] Bytes
+            </td>
+      <td>
+        [% download.md5 %]
+      </td>
+      <td>
+        [% download.sha1 %]
+      </td>
+      <td>
+        [% download.sha256 %]
+      </td>
+      <td>
+        <a download="[% download.filename %]" href="download/[% download.uuid %]">Click here</a>        
+      </td>            
+    </tr>
+    [% END %]
+  </tbody>
+</table>

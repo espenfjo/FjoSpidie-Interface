@@ -1,0 +1,40 @@
+<table class="table table-striped table-bordered table-hover headers">
+  <thead>
+    <th class="hheader" style="text-align:center">Request</th>
+    <th class="hheader" style="text-align:center">Response</th>
+  </thead>
+  <tbody>
+    [% FOREACH connection = connections %]
+    [% SET susp =  connection.suspicious ? 'suspicious' : 'normal' %]
+
+    [% Dumper.dump_html(connection.response) %]
+
+    <tr class="connection [% susp %]">
+      <td class="headers">
+        <b>
+	  [% connection.request.method %] [% connection.request.uri %] [% connection.request.httpversion %]
+          <br>
+          <br>
+        </b>
+        <div class="headers">              
+          [% FOREACH resprequest = connection.requests %]
+          <b> [% resprequest.name %]: </b> [% resprequest.value %] <br>
+          [% END %]
+        </div>
+      </td>
+      <td class="headers">
+        <b>
+          [% connection.response.status %] [% connection.response.statustext %] [% connection.response.httpversion %]
+          <br>
+          <br>
+        </b>
+        <div class="headers">              
+          [% FOREACH reqheader = connection.responses %]
+          <b> [% reqheader.name %]: </b> [% reqheader.value %] <br>              
+          [% END %] 
+          [% END %]
+        </div>
+      </td>          
+    </tr>
+  </tbody>
+</table>
