@@ -18,11 +18,22 @@ from reports.jobs import job
 from reports.models import Report
 
 def dashboard(request):
-        tags = {}
-        reports = Report.objects.order_by("-starttime")
-        return render_to_response("index.html",
-                                  {"reports" : reports},
-                                  context_instance=RequestContext(request))
+        if request.POST:
+                form = JobForm(request.POST)
+                if form.is_valid():
+                        uid = uuid.uuid4()
+                        job(uid, form.cleaned_data['url'], form.cleaned_data['useragent'], form.cleaned_data['referer'])
+                        return HttpResponseRedirect(reverse('report', args=[uid]))
+
+                else:
+                        print form
+        else:
+
+                tags = {}
+                reports = Report.objects.order_by("-starttime")
+                return render_to_response("index.html",
+                                          {"reports" : reports},
+                                          context_instance=RequestContext(request))
 
 def pcap(request, uuid):
         pass
