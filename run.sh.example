@@ -1,3 +1,0 @@
-URL=$@
-#ssh yourserver.com docker run -d -h "fjospidie$$" -t fjospidie bash /opt/fjospidie/run.sh $URL
-ssh fjospidie.yourserver.com bash /opt/fjospidie/run.sh $URL
