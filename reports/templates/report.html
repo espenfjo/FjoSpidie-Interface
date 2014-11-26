@@ -16,10 +16,10 @@
     </thead>
     <tbody>
       {% for alert in alerts %}
-      <tr rel="{{ alert.request.id }}" class="alert">
+      <tr rel="{{ alert.request_id }}" class="alert">
         <td>{{ alert.time }}</td>
-        <td>{{ alert.from_ip }}</td>
-        <td>{{ alert.to_ip }}</td>
+        <td>{{ alert.src }}</td>
+        <td>{{ alert.dst }}</td>
         <td class="alarm{{ alert.priority }}" > {{ alert.priority }}</td>
         <td>{{ alert.alarm_text }}</td>
       </tr>
@@ -30,7 +30,7 @@
   <section id="signatures">
     <h2>Yara signatures</h2>
     {% for yara in yaras %}
-      <div class="alert alert-danger signature" id="#signature_{{ yara.rule }}" rel="{{ yara.request_id }}">
+      <div class="alert alert-danger signature" id="#signature_{{ yara.rule }}" rel="{{ yara.entry_num }}">
         {{ yara.description }}
       </div>
     {% endfor %}

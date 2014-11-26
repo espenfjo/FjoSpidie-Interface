@@ -1,193 +1,156 @@
-from django.shortcuts import get_object_or_404, render, redirect, render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.core.urlresolvers import reverse
-from django.views import generic
-from django.db import connection
-import sys
 import collections
-from reports.models import Report, Alert, Download, Entry, Graph, Pcap, Screenshot
-from django.db.models import Count, Sum
-from django.utils.encoding import smart_text
-from reports.forms import JobForm
-from reports.jobs import job
+import gridfs
+import sys
 import uuid
 
-class IndexView(generic.ListView):
-    template_name = 'index.html'
-    context_object_name = 'reports'
+from bson.objectid import ObjectId
+from django.db import connections
+from django.db.models import Count, Sum
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import get_object_or_404, render, redirect, render_to_response
+from django.template import RequestContext
+from django.utils.encoding import smart_text
+from django.views import generic
 
-    def get_queryset(self, **kwargs):
-        cursor = connection.cursor()
-        statement = "SELECT r.id, r.url, r.uuid, r.starttime, count(a.id) as alerts FROM report r LEFT JOIN alert a ON a.report_id = r.id WHERE r.endtime IS NOT NULL GROUP BY r.id ORDER BY r.starttime DESC";
+from reports.forms import JobForm
+from reports.jobs import job
+from reports.models import Report
 
-        cursor.execute(statement)
-        records = cursor.fetchall()
-        data = []
-        for report in records:
-            data.append({
-                'id':report[0],
-                'url':report[1],
-                'uuid':report[2],
-                'starttime':report[3],
-                'alerts':report[4],
-            })
-        return data
-
-    def post(self, *args, **kwargs):
-        form = JobForm(self.request.POST)
-        if form.is_valid():
-            uid = uuid.uuid4()
-            job(uid, form.cleaned_data['url'], form.cleaned_data['useragent'], form.cleaned_data['referer'])
-            return HttpResponseRedirect(reverse('report', args=[uid]))
-
-        else:
-            print form
-
-    def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data(**kwargs)
-        context['uuid'] = uuid.uuid4
-
-        return context
-
-class DetailView(generic.DetailView):
-    model = Report
-    template_name = 'report.html'
-
+def dashboard(request):
+        tags = {}
+        reports = Report.objects.order_by("-starttime")
+        return render_to_response("index.html",
+                                  {"reports" : reports},
+                                  context_instance=RequestContext(request))
 
 def pcap(request, uuid):
-    r = get_object_or_404(Report, uuid=uuid)
-    p = get_object_or_404(Pcap.objects.select_related(), report=r.id)
-    response = HttpResponse(p.data, content_type='application/octet-stream')
-    response['Content-Length'] = len(p.data)
-    return response
+        pass
+#    r = get_object_or_404(Report, uuid=uuid)
+#    p = get_object_or_404(Pcap.objects.select_related(), report=r.id)
+#    response = HttpResponse(p.data, content_type='application/octet-stream')
+#    response['Content-Length'] = len(p.data)
+#    return response
 
 def pcap_size( rid ):
-    cursor = connection.cursor()
-    statement = "SELECT LENGTH(data) from pcap where report_id = %s";
+        pass
+    # cursor = connection.cursor()
+    # statement = "SELECT LENGTH(data) from pcap where report_id = %s";
 
-    cursor.execute(statement, [rid])
-    records = cursor.fetchall()
-    if records:
-        return records[0][0]
-    else:
-        return None
+    # cursor.execute(statement, [rid])
+    # records = cursor.fetchall()
+    # if records:
+    #     return records[0][0]
+    # else:
+    #     return None
 
 def graph(request, uuid):
-    r = get_object_or_404(Report, uuid=uuid)
-    g = get_object_or_404(Graph.objects.select_related(), report=r.id)
-    response = HttpResponse(g.graph, content_type='image/png')
-    response['Content-Length'] = len(g.graph)
-    return response
+        r = get_object_or_404(Report, uuid=uuid)
+        try:
+                db = connections['default']
+                fs = gridfs.GridFS(db.database)
+                if fs.exists(ObjectId(r.graph_id)):
+                        gridfile = fs.get(ObjectId(r.graph_id))
+        except Exception, e:
+                raise Http404
+        else:
+                image = gridfile.read()
+                response = HttpResponse(image, mimetype="image/png")
+                response['Content-Length'] = len(image)
+                return response
 
 def screenshot(request, uuid):
-    r = get_object_or_404(Report, uuid=uuid)
-    s = get_object_or_404(Screenshot.objects.select_related(), report=r.id)
-    response = HttpResponse(s.image, content_type='image/png')
-    response['Content-Length'] = len(s.image)
-    return response
+        r = get_object_or_404(Report, uuid=uuid)
+        try:
+                db = connections['default']
+                fs = gridfs.GridFS(db.database)
+                if fs.exists(ObjectId(r.screenshot_id)):
+                        gridfile = fs.get(ObjectId(r.screenshot_id))
+        except Exception, e:
+                raise Http404
+        else:
+                image = gridfile.read()
+                response = HttpResponse(image, mimetype="image/png")
+                response['Content-Length'] = len(image)
+                return response
 
 def report(request, uuid):
-    try:
-        r = Report.objects.get(uuid=uuid)
-    except Report.DoesNotExist:
-        return render(request, 'report.html', {'done':False} )
-    if not r.endtime:
-        raise Http404
+        try:
+                r = Report.objects.get(uuid=uuid)
+        except Report.DoesNotExist:
+                return render(request, 'report.html', {'done':False} )
+        if not r.endtime:
+                raise Http404
 
-    yara = yara_matches(r.uuid)
-    data = {
-        'report':    r,
-        'alerts':    Alert.objects.filter(report=r.id),
-        'downloads': Download.objects.filter(report=r.id),
-        'headers':   headers_html(headers(r.uuid)),
-        'pcap':      pcap_size(r.id),
-        'yaras':     yara
-    }
+        data = {
+                'report':    r,
+                'alerts':    r.alerts,
+                'downloads': r.downloads,
+                'headers':   headers_html(headers(r.entries)),
+                'pcap':      pcap_size(r),
+                'yaras':     yara_matches(r)
+        }
 
-    return render(request, 'report.html', data )
+        return render(request, 'report.html', data )
 
 
 def headers_html(headers):
-    html = ""
-    for key,header in headers.items():
-        html+="""<tr id='""" + str(header['rid']) + """' class="connection">
+        html = ""
+        for header in headers:
+                html+="""<tr id='""" + str(header['entry_num']) + """' class="connection">
         <td class="headers">
           <b>"""
-        html += header['method'] + " " + header['uri'] + " " + header['rhttpversion']
-        html +="""<br>
+                html += header['method'] + " " + header['uri'] + " " + header['request_http_version']
+                html +="""<br>
             <br>
           </b>
           <div class="headers">"""
-        for request_headers in header['request_header']:
-            html += u"<b> {}: </b>{} <br>".format(request_headers['name'],request_headers['value'])
-        html += """</div>
+                for request_headers in header['request_header']:
+                        html += u"<b> {}: </b>{} <br>".format(request_headers.name,request_headers.value)
+                html += """</div>
         </td>
         <td class="headers">
           <b>"""
-        html += "{} {} {}".format(header['status'], header['statustext'], header['httpversion'])
-        html +="""<br>
+                html += "{} {} {}".format(header['status'], header['status_text'], header['response_http_version'])
+                html +="""<br>
             <br>
           </b>
           <div class="headers">"""
-        for response in header['response_header']:
-            html +=u"<b>{}: </b> {} <br>".format(response['name'], response['value'])
-        html +="</div>"
+                for response in header['response_header']:
+                        html +=u"<b>{}: </b> {} <br>".format(response.name, response.value)
+                html +="</div>"
 
-    return html
-
-
-def yara_matches(uuid):
-    statement ="SELECT y.id, y.rule, y.description, r.id, request.id FROM yara y JOIN response_content rc on y.content_id = rc.id JOIN response r ON rc.response_id=r.id JOIN entry e ON r.entry_id = e.id JOIN report on e.report_id=report.id LEFT JOIN request ON request.entry_id = e.id WHERE ( report.uuid = %s )"
-    cursor = connection.cursor()
-
-    cursor.execute(statement, [uuid])
-    records = cursor.fetchall()
-    data = []
-    for match in records:
-        id          = match[0]
-        rule        = match[1]
-        description = match[2]
-        response_id = match[3]
-        request_id  = match[4]
-
-        data.append({'id': id, 'rule': rule, 'description': description, 'response_id':response_id, 'request_id':request_id })
-    return data
+        return html
 
 
-def headers(uuid):
-    from time import time
-    start = time()
-    cursor = connection.cursor()
-    statement = "SELECT me.id, me.entry_id, me.name, me.value, me.type, requests.host, requests.port, responses.httpversion, responses.statustext, responses.status, responses.bodysize, responses.headersize, requests.bodysize, requests.headersize, requests.method, requests.uri, requests.httpversion, requests.id, responses.id FROM header me JOIN entry entry ON entry.id = me.entry_id JOIN report report ON report.id = entry.report_id LEFT JOIN response responses ON responses.entry_id = entry.id LEFT JOIN request requests ON requests.entry_id = entry.id WHERE ( report.uuid = %s ) ORDER BY requests.id ASC"
+def yara_matches(report):
+        data = []
+        for entry in report.entries:
+                matches = []
+                for match in entry.parser_match:                        
+                        match.entry_num = entry.num
+                        matches.append(match)
+                data.extend(matches)
+        return data
 
-    cursor.execute(statement, [uuid])
-    records = cursor.fetchall()
-    data = collections.OrderedDict()
 
-    for header in records:
-        id           = header[0]
-        entry_id     = header[1]
-        name         = header[2]
-        value        = header[3]
-        type         = header[4]
-        host         = header[5]
-        port         = header[6]
-        httpversion  = header[7]
-        statustext   = header[8]
-        status       = header[9]
-        method       = header[14]
-        uri          = header[15]
-        rhttpversion = header[16]
-        rid          = header[17]
-        reid          = header[17]
+def headers(entries):
+        headers = []
+        data = {}
+        for entry in entries:
+                response = entry.response
+                request = entry.request
+                headers.append({
+                        'status':response.status,
+                        'host':request.hostname,
+                        'method':request.method,
+                        'uri':request.url,
+                        'request_http_version':request.http_version,
+                        'status_text':response.status_text,
+                        'response_http_version':response.http_version,
+                        'request_header': request.headers,
+                        'response_header':response.headers,
+                        'entry_num': entry.num
+                })
 
-        if not entry_id in data:
-            data[entry_id] ={ 'entry_id':entry_id, 'status':status,  'host':host, 'port':port, 'method':method, 'uri':uri, 'rhttpversion':rhttpversion, 'statustext':statustext, 'httpversion':httpversion, 'request_header':[], 'response_header':[], 'rid': rid, 'reid':reid}
-
-        for d in data:
-            if data[d]['entry_id'] == entry_id:
-                if type == 'request':
-                    data[d]['request_header'].append({'name':name,'value':value})
-                else:
-                    data[d]['response_header'].append({'name':name,'value':value})
-    return data
+        return headers

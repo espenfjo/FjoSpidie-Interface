@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djangotoolbox',
     'reports',
 )
 
@@ -60,10 +61,8 @@ TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE' : 'django_mongodb_engine',
         'NAME': 'fjospidie',
-        'USER': 'fjospidie',
-        'PASSWORD':'PASSWORD',
         'HOST': 'localhost'
     }
 }

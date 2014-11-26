@@ -8,25 +8,12 @@
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
 # into your database.
 from __future__ import unicode_literals
+from django_mongodb_engine.contrib import MongoDBManager
+from django_mongodb_engine.storage import GridFSStorage
+from djangotoolbox.fields import EmbeddedModelField, ListField, DictField
+
 
 from django.db import models
-
-class Alert(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey('Report')
-    alarm_text = models.TextField(blank=True)
-    classification = models.TextField(blank=True)
-    priority = models.IntegerField(blank=True, null=True)
-    protocol = models.CharField(max_length=10, blank=True)
-    from_ip = models.TextField(blank=True)
-    to_ip = models.TextField(blank=True)
-    time = models.TextField(blank=True)
-    request = models.ForeignKey('Request', db_column='request', blank=True, null=True)
-    http_method = models.TextField(blank=True)
-    http_request = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'alert'
 
 class AuthGroup(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -84,21 +71,6 @@ class AuthUserUserPermissions(models.Model):
         managed = False
         db_table = 'auth_user_user_permissions'
 
-class Cookie(models.Model):
-    id = models.IntegerField(primary_key=True)
-    response = models.ForeignKey('Response', blank=True, null=True)
-    name = models.TextField(blank=True)
-    value = models.BinaryField(blank=True, null=True)
-    path = models.TextField(blank=True)
-    domain = models.TextField(blank=True)
-    expires = models.TextField(blank=True)
-    httponly = models.TextField(blank=True)
-    secure = models.TextField(blank=True)
-    comment = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'cookie'
-
 class DjangoAdminLog(models.Model):
     id = models.IntegerField(primary_key=True)
     action_time = models.DateTimeField()
@@ -129,134 +101,73 @@ class DjangoSession(models.Model):
         managed = False
         db_table = 'django_session'
 
-class Download(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey('Report')
-    data = models.BinaryField(blank=True, null=True)
-    md5 = models.TextField(blank=True)
-    sha1 = models.TextField(blank=True)
-    sha256 = models.TextField(blank=True)
-    size = models.IntegerField(blank=True, null=True)
-    uuid = models.TextField(blank=True) # This field type is a guess.
-    filename = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'download'
-
-class Entry(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey('Report')
-    url = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'entry'
-
-class Graph(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey('Report')
-    graph = models.BinaryField(blank=True, null=True)
-    class Meta:
-        managed = False
-        db_table = 'graph'
-
-class Header(models.Model):
-    id = models.IntegerField(primary_key=True)
-    entry = models.ForeignKey(Entry, blank=True, null=True)
-    name = models.TextField(blank=True)
-    value = models.TextField(blank=True)
-    type = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'header'
-
-class Pcap(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey('Report', blank=True, null=True)
-    data = models.BinaryField(blank=True, null=True)
-    uuid = models.TextField(blank=True) # This field type is a guess.
-    class Meta:
-        managed = False
-        db_table = 'pcap'
-
 class Report(models.Model):
-    id = models.IntegerField(primary_key=True)
+    _id = models.TextField(primary_key=True)
     url = models.TextField(blank=True)
     starttime = models.DateTimeField()
     endtime = models.DateTimeField(blank=True, null=True)
-    uuid = models.TextField(blank=True) # This field type is a guess.
-    class Meta:
-        managed = False
-        db_table = 'report'
+    uuid = models.TextField(blank=True)
+    screenshot_id = models.TextField(blank=True)
+    graph_id = models.TextField(blank=True)
+    entries = ListField(EmbeddedModelField('Entry'))
+    alerts = ListField(EmbeddedModelField('Alerts'))
+    downloads = ListField(EmbeddedModelField('Downloads'))
+    
+    objects = MongoDBManager()
+    class MongoMeta:
+        db_table="analysis"
+
+class Entry(models.Model):
+    url = models.TextField()
+    num = models.TextField()
+    content = EmbeddedModelField('Content')
+    request = EmbeddedModelField('Request')
+    response = EmbeddedModelField('Response')
+    parser_match = ListField(EmbeddedModelField('YaraMatch'))
+
+
+class Alerts(models.Model):
+    src = models.TextField()
+    dst = models.TextField()
+    alarm_text = models.TextField()
+    classification = models.TextField()
+    priority = models.IntegerField()
+    http_method = models.TextField()
+    time = models.TextField()
+    http_request = models.TextField()
+    request_id = models.IntegerField()
+
+
+class Downloads(models.Model):
+    pass
+
+class Headers(models.Model):
+    header_type = models.TextField()
+    name = models.TextField()
+    value = models.TextField()
 
 class Request(models.Model):
-    id = models.IntegerField(primary_key=True)
-    entry = models.ForeignKey(Entry, blank=True, null=True)
-    bodysize = models.IntegerField(blank=True, null=True)
-    headersize = models.IntegerField(blank=True, null=True)
-    method = models.TextField(blank=True)
-    uri = models.TextField(blank=True)
-    httpversion = models.TextField(blank=True)
-    host = models.TextField(blank=True)
-    port = models.IntegerField(blank=True, null=True)
-    class Meta:
-        managed = False
-        db_table = 'request'
+    _id = models.TextField()
+    hostname = models.TextField()
+    method = models.TextField()
+    url = models.TextField()
+    http_version = models.TextField()
+    headers = ListField(EmbeddedModelField('Headers'))
 
 class Response(models.Model):
-    id = models.IntegerField(primary_key=True)
-    entry = models.ForeignKey(Entry, blank=True, null=True)
-    httpversion = models.TextField(blank=True)
-    statustext = models.TextField(blank=True)
-    status = models.IntegerField(blank=True, null=True)
-    bodysize = models.IntegerField(blank=True, null=True)
-    headersize = models.IntegerField(blank=True, null=True)
-    content = models.BinaryField(blank=True, null=True)
-    class Meta:
-        managed = False
-        db_table = 'response'
+    id = models.TextField(primary_key=True)
+    status = models.TextField()
+    status_text = models.TextField()
+    http_version = models.TextField()
+    headers = ListField(EmbeddedModelField('Headers'))
+    
+class Content(models.Model):
+    content_id = models.TextField()
+    md5 = models.TextField()
+    mime_type = models.TextField()
+    size = models.IntegerField()
 
-class ResponseContent(models.Model):
-    id = models.IntegerField(primary_key=True)
-    response = models.ForeignKey(Response, blank=True, null=True)
-    md5 = models.TextField(blank=True)
-    data = models.TextField(blank=True)
-    size = models.IntegerField(blank=True, null=True)
-    path = models.TextField(blank=True)
-    mimetype = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'response_content'
-
-class Screenshot(models.Model):
-    id = models.IntegerField(primary_key=True)
-    report = models.ForeignKey(Report, blank=True, null=True)
-    image = models.BinaryField(blank=True, null=True)
-    class Meta:
-        managed = False
-        db_table = 'screenshot'
-
-class Yara(models.Model):
-    id = models.IntegerField(primary_key=True)
-    content = models.ForeignKey(ResponseContent, blank=True, null=True)
-    rule = models.TextField(blank=True)
-    description = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'yara'
-
-class YaraString(models.Model):
-    id = models.IntegerField(primary_key=True)
-    yara = models.ForeignKey(Yara, blank=True, null=True)
-    string = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'yara_string'
-
-class YaraTag(models.Model):
-    id = models.IntegerField(primary_key=True)
-    yara = models.ForeignKey(Yara, blank=True, null=True)
-    tag = models.TextField(blank=True)
-    class Meta:
-        managed = False
-        db_table = 'yara_tag'
-
+class YaraMatch(models.Model):
+    description = models.TextField()
+    rule = models.TextField()
+    tags = models.TextField()
