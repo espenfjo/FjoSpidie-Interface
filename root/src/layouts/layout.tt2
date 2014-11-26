@@ -1,9 +1,0 @@
-[% IF no_wrapper;
-        debug("Passing page through as text: $template.name");
-        content;
-    ELSE;
-        wrapper = wrapper || 'layouts/full.tt2';
-        debug("Applying wrapper $wrapper to $template.name");
-        content WRAPPER $wrapper;
-    END;
--%]
