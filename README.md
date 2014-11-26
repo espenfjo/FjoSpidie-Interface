@@ -26,7 +26,7 @@ Or, uwsgi:
 FjoSpidie Interface
 ===================
 This is a WEB interface for the FjoSpidie Honey Client.
-It is based on Perl and Catalyst MVC.
+It is written in Python and built on django
 
 Building
 ========
