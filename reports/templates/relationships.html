@@ -1,0 +1,28 @@
+<h4>Relationships</h4>
+{% if relationships and relationships|length > 0 %}
+{% for type, items in relationships.items %}
+<h5>Duplicate {{ type }}</h5>
+<table class="table table-striped table-hover table-bordered">
+  <thead>
+    <th>{{ type }}</th>
+    <th>Analysis</th>
+  </thead>
+  <tbody>
+    {% for key,value in items.items %}
+    <tr>
+      <td class="col-md-6">{{key}}</td>
+      <td class="col-md-6">
+        {% for analysis in value %}
+        <a href="/{{ analysis.uuid }}">{{analysis.url}}</a>
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+
+{% endif %}
+{% if not relationships or relationships|length <= 0 %}
+<h5>No relation to other analysis found</h5>
+{% endif %}

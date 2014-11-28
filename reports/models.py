@@ -112,6 +112,7 @@ class Report(models.Model):
     entries = ListField(EmbeddedModelField('Entry'))
     alerts = ListField(EmbeddedModelField('Alerts'))
     downloads = ListField(EmbeddedModelField('Downloads'))
+    connections = ListField()
     
     objects = MongoDBManager()
     class MongoMeta:
