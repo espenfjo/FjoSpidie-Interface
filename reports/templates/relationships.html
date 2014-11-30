@@ -1,7 +1,7 @@
 <h4>Relationships</h4>
 {% if relationships and relationships|length > 0 %}
 {% for type, items in relationships.items %}
-<h5>Duplicate {{ type }}</h5>
+<h5>Shared {{ type }}</h5>
 <table class="table table-striped table-hover table-bordered">
   <thead>
     <th>{{ type }}</th>
@@ -21,7 +21,6 @@
   </tbody>
 </table>
 {% endfor %}
-
 {% endif %}
 {% if not relationships or relationships|length <= 0 %}
 <h5>No relation to other analysis found</h5>

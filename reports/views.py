@@ -105,14 +105,7 @@ def report(request, uuid):
     }
 
     return render(request, 'report.html', data)
-import time
-def timing(f):
-    def wrap(*args):
-        ret = f(*args)
-        return ret
-    return wrap
 
-@timing
 def find_relations(report):
     """
     Find relations to other reports/analysis
@@ -124,19 +117,27 @@ def find_relations(report):
     db = connections['default']
     col = db.get_collection('analysis')
     urls = []
-    print "Finding connections"
-    for connection in report.connections:
-        for report in Report.objects.raw_query({"$and": [{"connections": connection}, {"_id": {"$ne": ObjectId(report._id)}}]}):
-            if not connection in relations['connections']:
-                relations['connections'][connection] = []
-            relations['connections'][connection].append({"uuid":report.uuid, "url":report.url})
-    print "found conns"
-    print "Finding urls"
-    import cProfile,pstats
+    import cProfile, pstats
     import StringIO
     pr = cProfile.Profile()
     pr.enable()
+    print "Finding connections"
+    for connection in report.connections:
+        for c_report in col.find({"$and": [{"connections": connection}, {"_id": {"$ne": ObjectId(report._id)}}]}):
+            if not connection in relations['connections']:
+                relations['connections'][connection] = []
+            relations['connections'][connection].append({"uuid":c_report['uuid'], "url":c_report['url']})
+    pr.disable()
+    s = StringIO.StringIO()
+    ps = pstats.Stats(pr, stream=s).sort_stats("cumulative")
+    ps.print_stats()
+    print s.getvalue()
+
+    print "found conns"
+    print "Finding urls"
+    pr.enable()
     for entry in report.entries:
+        print "Finding for {}".format(entry.url)
         for m_report in col.find({"$and": [{"entries.url": entry.url}, {"_id": {"$ne": ObjectId(report._id)}}]}):
             if not entry.url in relations['urls']:
                 relations['urls'][entry.url] = []
