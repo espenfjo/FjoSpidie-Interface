@@ -25,7 +25,7 @@ def dashboard(request):
         else:
             print form
     else:
-        reports = Report.objects.order_by("-starttime")
+        reports = Report.objects.only('starttime', 'alerts', 'uuid', 'url').order_by("-starttime")
     return render_to_response("index.html",
                               {"reports": reports},
                               context_instance=RequestContext(request))
