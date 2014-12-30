@@ -4,20 +4,55 @@
   {% if done == False %}
   <!-- Done:{{ done }} -->
   {% endif %}
-  <h2>Checked {{ report.url }}</h2>
-  <div class="row">
-    <ul class="nav nav-tabs" id="modules">
-      <li class="active"><a href="#tab-overview" data-toggle="tab">Quick overview</a></li>
-      <li><a href="#tab-relationships" data-toggle="tab">Relationships</a></li>
-    </ul>
+  <div class="row down">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table table-striped table-bordered table-hover">
+            <tr>
+              <th>Checked URL:</th>
+              <td >{{ report.url }}</td>
+            </tr>
+            <tr>
+              <th>Report date:</th>
+              <td>{{ report.endtime }}</td>
+              </tr>
+            <tr>
+              <th>IP:</th>
+              <td>{{ report.ip }}</td>
+            </tr>
+            <tr>
+              <th>Location:</th>
+              <td>{{ report.geoip.country_name }}</td>
+            </tr>
+            <tr>
+              <th>City:</th>
+              <td>{{ report.geoip.city }}</td>
+            </tr>
+            <tr>
+              <th>Organisation:</th>
+              <td>{{ report.geoip.organisation }}</td>
+            </tr>
+            <tr>
+              <th>ISP:</th>
+              <td>{{ report.geoip.isp }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
+  <ul class="nav nav-tabs" id="modules">
+    <li class="active"><a href="#tab-overview" data-toggle="tab">Quick overview</a></li>
+    <li><a href="#tab-relationships" data-toggle="tab">Relationships</a></li>
+  </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tab-overview">
       {% include "overview.html" %}
     </div>
     <div class="tab-pane" id="tab-relationships">
       {% include "relationships.html" %}
-    </div>    
+    </div>
   </div>
 
 </div>

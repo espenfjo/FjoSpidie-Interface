@@ -109,7 +109,6 @@ tr.suspicious {
 }
 table{
     table-layout: auto;
-
 }
 td {
     word-wrap: break-word;
@@ -123,7 +122,6 @@ th.hheader {
 td.headers {
     width: 50%;
     cursor: pointer;
-
 }
 
 
@@ -153,4 +151,8 @@ img.graph {
     padding-left: 10px;
     margin-bottom: 5px;
     cursor: pointer;
+}
+
+.down {
+    margin-top: 1em;
 }

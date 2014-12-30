@@ -171,7 +171,10 @@ def headers_html(headers):
         html += """</div>
 </td>
 <td class="headers">
-  <b>"""
+<b>"""
+        print header
+        html +=header['ip']
+        html +="<br>"
         html += "{} {} {}".format(header['status'],
                                   header['status_text'], header['response_http_version'])
         html += """<br>
@@ -212,7 +215,8 @@ def headers(entries):
             'response_http_version': response.http_version,
             'request_header': request.headers,
             'response_header': response.headers,
-            'entry_num': entry.num
+            'entry_num': entry.num,
+            'ip': entry.ip
         })
 
     return headers

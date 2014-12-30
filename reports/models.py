@@ -113,14 +113,23 @@ class Report(models.Model):
     alerts = ListField(EmbeddedModelField('Alerts'))
     downloads = ListField(EmbeddedModelField('Downloads'))
     connections = ListField()
-    
+    geoip = EmbeddedModelField('GeoIP')
+    ip = models.TextField(blank=True)
+
     objects = MongoDBManager()
     class MongoMeta:
         db_table="analysis"
 
+class GeoIP(models.Model):
+    country_name = models.TextField(null=True)
+    city = models.TextField(null=True)
+    organisation = models.TextField(blank=True, null=True)
+    isp = models.TextField(blank=True, null=True)
+
 class Entry(models.Model):
     url = models.TextField()
     num = models.TextField()
+    ip = models.TextField()
     content = EmbeddedModelField('Content')
     request = EmbeddedModelField('Request')
     response = EmbeddedModelField('Response')
