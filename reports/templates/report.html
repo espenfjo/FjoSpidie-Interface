@@ -19,7 +19,12 @@
               </tr>
             <tr>
               <th>IP:</th>
-              <td> {% autoescape off %}{{ rip }}{% endautoescape %}</td>
+              <td>
+                <a href="search/?ip={{ report.ip }}" class="popoverip btn" data-content='<code class="prettify"> {{ report.geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ report.ip }}" data-trigger="hover">
+                  <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{{ report.geoip.country_code|lower }}" alt="{{ report.geoip.country_name}}" />
+                  <b> {{ report.ip }} </b>
+                </a>
+              </td>
             </tr>
             <tr>
               <th>Location:</th>

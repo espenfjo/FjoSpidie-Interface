@@ -11,12 +11,6 @@
       <button class="btn btn-primary ">Search</button>
     </span>
   </div>
-  {% if error %}
-  <div class="error">
-    <h5>{{ error }}</h5>
-  </div>
-  {% endif %}
-
 </form>
 <div id="help" class="collapse" style="height: 0px;">
   <table class="table table-striped table-centered">
@@ -38,6 +32,17 @@
     </tbody>
   </table>
 </div>
+
+{% if value %}
+<div class="alert alert-success" role="alert">
+  <h5>Searched for: {{ value }}</h5>
+</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger" role="alert">
+  <h5>{{ error }}</h5>
+</div>
+{% endif %}
 
 {% if reports %}
 <table class="table table-striped table-centered">

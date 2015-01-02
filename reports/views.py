@@ -97,7 +97,6 @@ def report(request, uuid):
     relationships = find_relations(r)
     data = {
         'report':    r,
-        'rip': get_ip_html(r.ip, r.geoip),
         'relationships': relationships,
         'alerts':    r.alerts,
         'downloads': r.downloads,
@@ -153,7 +152,7 @@ def find_relations(report):
     return relations
 
 def get_ip_html(ip, ipdata):
-    if not ip:
+    if not ip or not ipdata:
         return ""
     if isinstance(ipdata, GeoIP):
         ipdata = ipdata.__dict__
@@ -163,13 +162,13 @@ def get_ip_html(ip, ipdata):
     ipdata_formatted = simplejson.dumps(ipdata, sort_keys=True, indent=4)
     ipdata_formatted = ipdata_formatted.replace("\n", "<br>\n")
 
-    html = """<div class="popoverip btn" data-content='<code class="prettify">{}</code>' """.format(ipdata_formatted)
+    html = """<a href="/search/?ip={}" class="popoverip btn" data-content='<code class="prettify">{}</code>' """.format(ip, ipdata_formatted)
     html += """rel="popover" data-placement="bottom" data-html="true" data-original-title="{}" """.format(ip)
     html += """data-trigger="hover"><b>"""
     if ipdata['country_code']:
         html += '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{}" alt="{}" /> '.format(ipdata['country_code'].lower(), ipdata['country_name'])
     html += ip
-    html += """</b></div>"""
+    html += """</b></a>"""
 
     return html
 
@@ -249,13 +248,21 @@ def search(request):
     reports = []
     error = None
     term = None
-    tag = request.GET.get('tag', None)
-    if "search" in request.POST or tag:
+    value = None
+    ip_search = request.GET.get('ip', None)
+    url_search = request.GET.get('url', None)
+    print ip_search
+    if "search" in request.POST or (ip_search or url_search):
         error = None
 
-        if tag:
-            term = "tag"
-            value = tag
+        if ip_search:
+            print "We have IP"
+            term = "ip"
+            value = ip_search
+        elif url_search:
+            term = "url"
+            value = url_search
+
         else:
             try:
                 term, value = request.POST["search"].strip().split(":", 1)
@@ -276,7 +283,7 @@ def search(request):
             if term == "url":
                 reports = Report.objects.raw_query({"$query": {"url": {"$regex": value, "$options": "-i"}}, "$orderby":{"endtime":-1}})
             elif term == "ip":
-                reports = Report.objects.raw_query({"$query":{"ip": {"$regex": value, "$options": "-i"}}, "$orderby":{"endtime":-1}})
+                reports = Report.objects.raw_query({"$query": {"$or": [{"ip": value}, {"entries.ip": value}]}, "$orderby":{"endtime":-1}})
             else:
                 error = "Unable to recognize the search syntax"
 
@@ -285,7 +292,8 @@ def search(request):
 
 
     return render_to_response("search.html",
-                                  {"reports": reports,
-                                   "term": term,
-                                   "error": error},
-                                  context_instance=RequestContext(request))
+                              {"reports": reports,
+                               "term": term,
+                               "value": value,
+                               "error": error},
+                              context_instance=RequestContext(request))

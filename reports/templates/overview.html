@@ -1,3 +1,4 @@
+{% if alerts and alerts|length > 0 %}
 <h2>Snort VRT w/Emerging Threats</h2>
 <table class="table table-striped table-bordered table-hover">
   <thead>
@@ -13,10 +14,12 @@
       <td>{{ alert.time }}</td>
       <td>
         <div class="popoverip btn" data-content='<code class="prettify"> {{ alert.src_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.src }}" data-trigger="hover">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{{ alert.src_geoip.country_code|lower }}" alt="{{ alert.src_geoip.country_name}}" />
           <b> {{ alert.src }} </b>
       </td>
       <td>
         <div class="popoverip btn" data-content='<code class="prettify"> {{ alert.dst_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.dst }}" data-trigger="hover">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{{ alert.dst_geoip.country_code|lower }}" alt="{{ alert.dst_geoip.country_name}}" />
           <b> {{ alert.dst }} </b>
         </div>
       </td>
@@ -26,6 +29,7 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 {% if yaras and yaras|length > 0 %}
 <section id="signatures">
   <h2>Yara signatures</h2>
