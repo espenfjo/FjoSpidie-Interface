@@ -251,7 +251,6 @@ def search(request):
     value = None
     ip_search = request.GET.get('ip', None)
     url_search = request.GET.get('url', None)
-    print ip_search
     if "search" in request.POST or (ip_search or url_search):
         error = None
 
@@ -283,7 +282,7 @@ def search(request):
             if term == "url":
                 reports = Report.objects.raw_query({"$query": {"url": {"$regex": value, "$options": "-i"}}, "$orderby":{"endtime":-1}})
             elif term == "ip":
-                reports = Report.objects.raw_query({"$query": {"$or": [{"ip": value}, {"entries.ip": value}]}, "$orderby":{"endtime":-1}})
+                reports = Report.objects.raw_query({"$query": {"$or": [{"ip": value}, {"entries.ip": value}, {"alerts.src": value}, {"alerts.dst": value}]}, "$orderby":{"endtime":-1}})
             else:
                 error = "Unable to recognize the search syntax"
 
