@@ -13,15 +13,16 @@
     <tr rel="{{ alert.request_id }}" class="alert">
       <td>{{ alert.time }}</td>
       <td>
-        <div class="popoverip btn" data-content='<code class="prettify"> {{ alert.src_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.src }}" data-trigger="hover">
+        <a href="/search/?ip={{ alert.src }}" class="popoverip btn" data-content='<code class="prettify"> {{ alert.src_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.src }}" data-trigger="hover">
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{{ alert.src_geoip.country_code|lower }}" alt="{{ alert.src_geoip.country_name}}" />
           <b> {{ alert.src }} </b>
+        </a>
       </td>
       <td>
-        <div class="popoverip btn" data-content='<code class="prettify"> {{ alert.dst_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.dst }}" data-trigger="hover">
+        <a href="/search/?ip={{ alert.dst }}" class="popoverip btn" data-content='<code class="prettify"> {{ alert.dst_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.dst }}" data-trigger="hover">
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{{ alert.dst_geoip.country_code|lower }}" alt="{{ alert.dst_geoip.country_name}}" />
           <b> {{ alert.dst }} </b>
-        </div>
+        </a>
       </td>
       <td class="alarm{{ alert.priority }}" > {{ alert.priority }}</td>
       <td>{{ alert.alarm_text }}</td>
