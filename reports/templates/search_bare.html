@@ -1,0 +1,59 @@
+<form class="form search" role="form" action="/search" enctype="multipart/form-data" method="post">
+  {% csrf_token %}
+  <div class="input-group col-md-8 col-md-offset-2">
+    <p class="text-muted" style="margin-top: 5px;">
+      For details on how to perform searches, get some <a href="#help" data-toggle="collapse" class="collapsed">help</a>.
+    </p>
+  </div>
+  <div class="input-group col-md-6 col-md-offset-2">
+  <span class="input-group-btn">
+      <input type="text" class="form-control" id="search" name="search" placeholder="Search term">
+      <button class="btn btn-primary ">Search</button>
+    </span>
+  </div>
+  {% if error %}
+  <div class="error">
+    <h5>{{ error }}</h5>
+  </div>
+  {% endif %}
+
+</form>
+<div id="help" class="collapse" style="height: 0px;">
+  <table class="table table-striped table-centered">
+    <thead>
+      <tr>
+        <th>Prefix</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>url:</code></td>
+        <td>URL</td>
+      </tr>
+      <tr>
+        <td><code>ip:</code></td>
+        <td>IP Address</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% if reports %}
+<table class="table table-striped table-centered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Report date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for report in reports %}
+    <tr>
+      <td><a href="/{{report.uuid}}">{{report.url}}</a></td>
+      <td>{{report.endtime}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}

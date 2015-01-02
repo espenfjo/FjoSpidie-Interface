@@ -1,0 +1,8 @@
+{% extends "layouts/full.html" %}
+{% block content %}
+<div class="row">
+  {% with "search_bare.html" as template %}
+  {% include template %}
+  {% endwith %}
+</div>
+{% endblock %}

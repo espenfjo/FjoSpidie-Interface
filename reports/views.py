@@ -239,7 +239,53 @@ def headers(entries):
             'request_header': request.headers,
             'response_header': response.headers,
             'entry_num': entry.num,
-            'ip': entry.ip
+            'ip': entry.ip,
+            'ipdata': entry.geoip
         })
 
     return headers
+
+def search(request):
+    reports = []
+    error = None
+    term = None
+    tag = request.GET.get('tag', None)
+    if "search" in request.POST or tag:
+        error = None
+
+        if tag:
+            term = "tag"
+            value = tag
+        else:
+            try:
+                term, value = request.POST["search"].strip().split(":", 1)
+            except ValueError:
+                term = ""
+                value = request.POST["search"].strip()
+
+            # Check on search size.
+        if len(value) < 3:
+            return render_to_response("search.html",
+                                      {"analyses": None,
+                                       "term": term,
+                                       "error": "Search term too short, minimum 3 characters required"},
+                                      context_instance=RequestContext(request))
+
+        value = value.strip()
+        if term:
+            if term == "url":
+                reports = Report.objects.raw_query({"$query": {"url": {"$regex": value, "$options": "-i"}}, "$orderby":{"endtime":-1}})
+            elif term == "ip":
+                reports = Report.objects.raw_query({"$query":{"ip": {"$regex": value, "$options": "-i"}}, "$orderby":{"endtime":-1}})
+            else:
+                error = "Unable to recognize the search syntax"
+
+        if not reports:
+            error = "No results found"
+
+
+    return render_to_response("search.html",
+                                  {"reports": reports,
+                                   "term": term,
+                                   "error": error},
+                                  context_instance=RequestContext(request))

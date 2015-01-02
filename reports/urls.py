@@ -9,6 +9,7 @@ urlpatterns = patterns('',
                        url(r'^(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/graph/?$', views.graph, name='graph'),
                        url(r'^(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/screenshot/?$', views.screenshot, name='screenshot'),
                        url(r'^(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/pcap/?$', views.pcap, name='pcap'),
+                       url(r'^search', views.search, name='search'),
                        url(r'^login$','django.contrib.auth.views.login', {'template_name': 'login.html'}),
                        url(r'^logout$','django.contrib.auth.views.logout_then_login')
                    
