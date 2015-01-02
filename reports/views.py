@@ -1,5 +1,7 @@
 import gridfs
 import uuid
+import simplejson
+import re
 
 from bson.objectid import ObjectId
 from django.db import connections
@@ -10,7 +12,7 @@ from django.template import RequestContext
 
 from reports.forms import JobForm
 from reports.jobs import job
-from reports.models import Report
+from reports.models import Report, GeoIP
 
 
 def dashboard(request):
@@ -93,9 +95,9 @@ def report(request, uuid):
     if not r.endtime:
         raise Http404
     relationships = find_relations(r)
-
     data = {
         'report':    r,
+        'rip': get_ip_html(r.ip, r.geoip),
         'relationships': relationships,
         'alerts':    r.alerts,
         'downloads': r.downloads,
@@ -150,6 +152,27 @@ def find_relations(report):
 
     return relations
 
+def get_ip_html(ip, ipdata):
+    if not ip:
+        return ""
+    if isinstance(ipdata, GeoIP):
+        ipdata = ipdata.__dict__
+        if '_state' in ipdata:
+            ipdata.pop('_state')
+            ipdata.pop('_original_pk')
+    ipdata_formatted = simplejson.dumps(ipdata, sort_keys=True, indent=4)
+    ipdata_formatted = ipdata_formatted.replace("\n", "<br>\n")
+
+    html = """<div class="popoverip btn" data-content='<code class="prettify">{}</code>' """.format(ipdata_formatted)
+    html += """rel="popover" data-placement="bottom" data-html="true" data-original-title="{}" """.format(ip)
+    html += """data-trigger="hover"><b>"""
+    if ipdata['country_code']:
+        html += '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="flag flag-{}" alt="{}" /> '.format(ipdata['country_code'].lower(), ipdata['country_name'])
+    html += ip
+    html += """</b></div>"""
+
+    return html
+
 def headers_html(headers):
     """
     Since Django / Templates are slow, make our own html
@@ -166,15 +189,15 @@ def headers_html(headers):
   </b>
   <div class="headers">"""
         for request_headers in header['request_header']:
+            ip_html = get_ip_html(header['ip'], header['ipdata'])
             html += u"<b> {}: </b>{} <br>".format(request_headers.name,
                                                   request_headers.value)
         html += """</div>
 </td>
 <td class="headers">
 <b>"""
-        print header
-        html +=header['ip']
-        html +="<br>"
+        html += ip_html
+        html += "<br>"
         html += "{} {} {}".format(header['status'],
                                   header['status_text'], header['response_http_version'])
         html += """<br>

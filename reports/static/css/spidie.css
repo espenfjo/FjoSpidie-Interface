@@ -156,3 +156,13 @@ img.graph {
 .down {
     margin-top: 1em;
 }
+
+.popoverip {
+    padding: 0;
+    color: #337ab7;
+ 
+}
+.tooltip-inner {
+    white-space:pre;
+    max-width:none;
+}

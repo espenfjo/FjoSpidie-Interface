@@ -37,6 +37,7 @@ $(document).ready(function() {
 });
 
 function setupListeners() {
+    $('.popoverip').popover();
     $("#submit-advanced").on("click", function() {
         $("#advanced-inputs").toggle();
         if ($("#advanced-inputs").is(":visible")) {

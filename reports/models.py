@@ -12,6 +12,7 @@ from django_mongodb_engine.contrib import MongoDBManager
 from django_mongodb_engine.storage import GridFSStorage
 from djangotoolbox.fields import EmbeddedModelField, ListField, DictField
 
+import simplejson
 
 from django.db import models
 
@@ -113,7 +114,7 @@ class Report(models.Model):
     alerts = ListField(EmbeddedModelField('Alerts'))
     downloads = ListField(EmbeddedModelField('Downloads'))
     connections = ListField()
-    geoip = EmbeddedModelField('GeoIP')
+    geoip = EmbeddedModelField('GeoIP', null=True)
     ip = models.TextField(blank=True)
 
     objects = MongoDBManager()
@@ -125,11 +126,31 @@ class GeoIP(models.Model):
     city = models.TextField(null=True)
     organisation = models.TextField(blank=True, null=True)
     isp = models.TextField(blank=True, null=True)
+    region_code = models.TextField(null=True)
+    area_code = models.TextField(null=True)
+    time_zone = models.TextField(null=True)
+    dma_code = models.TextField(null=True)
+    metro_code = models.TextField(null=True)
+    country_code3 = models.TextField(null=True)
+    country_code = models.TextField(null=True)
+    latitude = models.TextField(null=True)
+    postal_code = models.TextField(null=True)
+    longitude = models.TextField(null=True)
+    continent = models.TextField(null=True)
+    def __str__(self):
+        ipdata = self.__dict__
+        if '_state' in ipdata:
+            ipdata.pop('_state')
+            ipdata.pop('_original_pk')
+        ipdata_formatted = simplejson.dumps(ipdata, sort_keys=True, indent=4)
+        ipdata_formatted = ipdata_formatted.replace("\n", "<br>\n")
+        return ipdata_formatted
 
 class Entry(models.Model):
     url = models.TextField()
     num = models.TextField()
     ip = models.TextField()
+    geoip = EmbeddedModelField('GeoIP', null=True)
     content = EmbeddedModelField('Content')
     request = EmbeddedModelField('Request')
     response = EmbeddedModelField('Response')
@@ -139,6 +160,8 @@ class Entry(models.Model):
 class Alerts(models.Model):
     src = models.TextField()
     dst = models.TextField()
+    src_geoip = EmbeddedModelField('GeoIP', null=True)
+    dst_geoip = EmbeddedModelField('GeoIP', null=True)
     alarm_text = models.TextField()
     classification = models.TextField()
     priority = models.IntegerField()
@@ -170,7 +193,7 @@ class Response(models.Model):
     status_text = models.TextField()
     http_version = models.TextField()
     headers = ListField(EmbeddedModelField('Headers'))
-    
+
 class Content(models.Model):
     content_id = models.TextField()
     md5 = models.TextField()

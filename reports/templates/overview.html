@@ -11,8 +11,15 @@
     {% for alert in alerts %}
     <tr rel="{{ alert.request_id }}" class="alert">
       <td>{{ alert.time }}</td>
-      <td>{{ alert.src }}</td>
-      <td>{{ alert.dst }}</td>
+      <td>
+        <div class="popoverip btn" data-content='<code class="prettify"> {{ alert.src_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.src }}" data-trigger="hover">
+          <b> {{ alert.src }} </b>
+      </td>
+      <td>
+        <div class="popoverip btn" data-content='<code class="prettify"> {{ alert.dst_geoip }}</code>' rel="popover" data-placement="bottom" data-html="true" data-original-title="{{ alert.dst }}" data-trigger="hover">
+          <b> {{ alert.dst }} </b>
+        </div>
+      </td>
       <td class="alarm{{ alert.priority }}" > {{ alert.priority }}</td>
       <td>{{ alert.alarm_text }}</td>
     </tr>
