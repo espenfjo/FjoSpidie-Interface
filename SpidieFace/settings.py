@@ -59,11 +59,12 @@ TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
+## Note that HOST: localhost will not work as the docker containers use this host for communications
 DATABASES = {
     'default': {
         'ENGINE' : 'django_mongodb_engine',
         'NAME': 'fjospidie',
-        'HOST': 'localhost'
+        'HOST': 'x.x.x.x'
     }
 }
 INTERCEPT_REDIRECTS=True
