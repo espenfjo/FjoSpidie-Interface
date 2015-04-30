@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'u8fh97qio4wpeafidj98aiow$q@aifjsd$T%$Y"tyc546SADFCEVTRJOECHXP'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -64,7 +64,8 @@ DATABASES = {
     'default': {
         'ENGINE' : 'django_mongodb_engine',
         'NAME': 'fjospidie',
-        'HOST': 'x.x.x.x'
+        'HOST': os.environ['MONGO_HOST'],
+        'PORT': os.environ['MONGO_PORT']
     }
 }
 INTERCEPT_REDIRECTS=True
@@ -75,14 +76,9 @@ HIDE_DJANGO_SQL=False
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_L10N = True
-
-USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/

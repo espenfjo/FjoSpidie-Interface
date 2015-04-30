@@ -1,5 +1,0 @@
-django
-djangotoolbox
-pymongo
-pydocker
-mongoengine
